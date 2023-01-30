@@ -2,8 +2,8 @@
  * @Author: hfqf123@126.com
  * @Date: 2023-01-09 08:38:46
  * @LastEditors: user.email
- * @LastEditTime: 2023-01-30 19:10:51
- * @FilePath: /软设流程图/app设计规范/软件设计原则(SOLID)/单一职责(SRP)/README.md
+ * @LastEditTime: 2023-01-30 20:04:22
+ * @FilePath: /design-pattern/app设计规范/软件设计原则(SOLID)/单一职责(SRP)/README.md
  * @Description: 
  * 
  * Copyright (c) 2023 by hfqf123@126.com, All Rights Reserved. 
@@ -22,14 +22,11 @@
 
 ```
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    //监听退出登录
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(jumpLogin) name:@"logOut" object:nil];
-//    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(uploadPushId) name:@"RegistrationID" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(jumpRoot) name:@"JumpRoot" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(addTags:) name:@"AddTags" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(exchangeStore:) name:@"ExchangeStore" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(launchResource) name:@"HYXLaunchResourceDidChangeNotification" object:nil];
-    /// 三个通知保证baselib和主工程的usercenter都有值，否则首次打开app会没有用户数据
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveLoginUserInfo:) name:@"saveLoginUserInfo" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveBaseSync:) name:@"saveBaseSync" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveSignBaseSync:) name:@"saveSignBaseSync" object:nil];
@@ -37,17 +34,8 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveDpInfo:) name:@"SaveDpInfo" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveIMessage:) name:@"HYXZDHMessageRedPointNotification" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(postRequest) name:HTTPPOSTRequestNotification object:nil];
-
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onUploadAppEnter) name:kHYXAppEnterBackgroundNotification object:nil];
-
-    //延迟部分sdk初始化，优化启动速度
-    [self initDelay4AppSpeedUpdate];
-    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(collectionOCRLog:) name:@"collectionOCRLog" object:nil];
-    ////配置入口配置资源
-    [BaseTool initDynamicManager];
-    /// 初始化弹窗管理器->监听资源更新
-    [BaseTool initCommonAlertManager];
     [self appLunchHandleCollectionLocalLog:launchOptions];
     return YES ;
 }
@@ -58,8 +46,6 @@
 ```
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [self.appNotisManager addObserver];
-    /// 缓存远程通知信息 若存在，在获取店铺信息后 将会处理跳转事件
-    [[HYXPushAndPlayManager sharedInstance] setKickNotificationUserInfo:[launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey]];
     return YES ;
 }
 
