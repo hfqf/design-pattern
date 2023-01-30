@@ -2,16 +2,18 @@
  * @Author: hfqf123@126.com
  * @Date: 2023-01-09 08:38:46
  * @LastEditors: user.email
- * @LastEditTime: 2023-01-30 20:09:28
- * @FilePath: /design-pattern/app设计规范/软件设计原则(SOLID)/单一职责(SRP)/README.md
+ * @LastEditTime: 2023-01-30 19:38:45
+ * @FilePath: /软设流程图/app设计规范/软件设计原则(SOLID)/接口隔离原则(ISP)/README.md
  * @Description: 
  * 
  * Copyright (c) 2023 by hfqf123@126.com, All Rights Reserved. 
 -->
-# 单一职责原则
+# 接口隔离原则
 
 ### **介绍**
-单一职责原则（Single responsibility principle）规定每个类或者模块都应该有且仅有一个单一的功能，并且该功能应该由这个类或者模块完全封装起来。
+依赖倒置原则（Dependence Inversion Principle，DIP）是指设计代码结构时，高层模块不应该依赖低层模块，二者都应该依赖其抽象。
+
+抽象不应该依赖细节，细节应该依赖抽象。通过依赖倒置，可以减少类与类之间的耦合性，提高系统的稳定性，提高代码的可读性和可维护性，并且能够降低修改程序所造成的风险。
 
 ### **问题来源**
 说到单一职责原则，很多人都会不屑一顾，因为它太简单了。稍有经验的程序员即使从来没有读过设计模式，从来没有听说过单一职责原则，在设计软件的时候也会自觉遵守这个重要原则，因为这是一个常识。在软件编程中，谁也不希望因为修改了一个功能导致其他的功能发生故障。而避免出现这一问题的方法便是遵循单一职责原则。虽然单一职责原则如此简单，并且被认为是常识，但是即使是经验丰富的程序员写出的程序也会有违背这一设计原则的代码存在。这是职责扩散导致的。
@@ -46,6 +48,7 @@
 ```
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [self.appNotisManager addObserver];
+    [launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey]];
     return YES ;
 }
 
@@ -62,7 +65,7 @@
     [self.thirdSDKNotisProxy registObserver];
 }
 ```
-经过改造可以看到每个业务模块的通知注册和实现被隔离至专门的类中，模块之间不会相互干扰，大大方便了后续扩充和维护。
+
 ### **优点**
 
 1.降低类的复杂度，一个类只负责一个职责。这样写出来的代码逻辑肯定要比负责多项职责简单得多。
