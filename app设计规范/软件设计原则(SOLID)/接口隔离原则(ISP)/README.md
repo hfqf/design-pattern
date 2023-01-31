@@ -1,9 +1,9 @@
 <!--
  * @Author: hfqf123@126.com
  * @Date: 2023-01-09 08:38:46
- * @LastEditors: user.email
- * @LastEditTime: 2023-01-30 19:38:45
- * @FilePath: /软设流程图/app设计规范/软件设计原则(SOLID)/接口隔离原则(ISP)/README.md
+ * @LastEditors: hfqf123@126.com
+ * @LastEditTime: 2023-01-31 18:41:14
+ * @FilePath: /design-pattern/app设计规范/软件设计原则(SOLID)/接口隔离原则(ISP)/README.md
  * @Description: 
  * 
  * Copyright (c) 2023 by hfqf123@126.com, All Rights Reserved. 
@@ -11,70 +11,163 @@
 # 接口隔离原则
 
 ### **介绍**
-依赖倒置原则（Dependence Inversion Principle，DIP）是指设计代码结构时，高层模块不应该依赖低层模块，二者都应该依赖其抽象。
-
-抽象不应该依赖细节，细节应该依赖抽象。通过依赖倒置，可以减少类与类之间的耦合性，提高系统的稳定性，提高代码的可读性和可维护性，并且能够降低修改程序所造成的风险。
+接口隔离原则（Interface Segregation Principle, ISP）是指用多个专门的接口，而不使用单一的总接口，调用者尽量不去依赖需要的接口。
+ * 接口类(服务)暴露时尽量内敛，不相关的拆成多个接口类。
+ * 调用者按照实际需要依赖所需接口。
 
 ### **问题来源**
-说到单一职责原则，很多人都会不屑一顾，因为它太简单了。稍有经验的程序员即使从来没有读过设计模式，从来没有听说过单一职责原则，在设计软件的时候也会自觉遵守这个重要原则，因为这是一个常识。在软件编程中，谁也不希望因为修改了一个功能导致其他的功能发生故障。而避免出现这一问题的方法便是遵循单一职责原则。虽然单一职责原则如此简单，并且被认为是常识，但是即使是经验丰富的程序员写出的程序也会有违背这一设计原则的代码存在。这是职责扩散导致的。
-
+当接口类(服务)暴露过多接口或者划分不好，会导致自身功能耦合，且影响使用者的按需使用。
 ### **优化示例**
 
 1.修改前
+```
+///  跨模块调用注册的方法
+@protocol HYXPushAndPlayModuleService <NSObject>
 
+@property (nonatomic, copy) HYXPushAndPlayManagerDownloadDidStartSpeechUtteranceBlock _Nullable  startSpeechUtteranceBlock;
+
+@property (nonatomic, copy) HYXPushAndPlayManagerDownloaddidFinishSpeechUtteranceBlock _Nullable finishSpeechUtteranceBlock;
+
+@property (nonatomic,strong) NSMutableDictionary * _Nullable downLoadHistoryDictionary;
+
+//@property (nonatomic,strong) AFURLSessionManager * _Nullable manager;
+
+@property (nonatomic,strong) NSString  * _Nullable fileHistoryPath;
+
+@property (nonatomic, assign) float originalVoiceValue;
+
+@required
+
+- (void)initJPush;
+
+- (void)initGPush;
+
+- (void)verifyDownloadStates;
+
+- (BOOL)needDownLoadVersion;
+
+- (void)startDownload:(HYXPushAndPlayManagerDownloadingBlock _Nullable)progeressBlock
+               failed:(HYXPushAndPlayManagerDownloadFailedBlock _Nullable)failedBlock
+                unZip:(HYXPushAndPlayManagerDownloadUnZipBlock _Nullable)unZipBlock;
+
+
+// 删除离线语音包
+- (BOOL)_deleteVoiceFiles;
+
+// 解压zip
+- (void)_unZipFileWithFile:(NSURL * _Nullable)fileUrlPath unZip:(HYXPushAndPlayManagerDownloadUnZipBlock _Nullable)unZipBlock;
+
+#pragma mark - 自检
+
+- (void)playCustomMsg:(NSString* _Nullable)msg;
+
+- (void)readContent:(NSString* _Nullable)str msgId:(NSString *)msgId;
+
+- (void)adjustVoice;
+
+/// 是否应该调整语音
+- (BOOL)shouldAdjustVoice;
+
+- (BOOL)backgroundMode;
+
+- (NSURLSessionDownloadTask  * _Nullable)AFDownLoadFileWithUrl:(NSString* _Nullable)urlHost
+                                            progress:(DowningProgress _Nullable)progress
+                                        fileLocalUrl:(NSURL * _Nullable)localUrl
+                                             success:(DonwLoadSuccessBlock _Nullable)success
+                                             failure:(DownLoadfailBlock _Nullable)failure;
+
+/** 停止所有的下载任务*/
+- (void)stopAllDownLoadTasks;
+
+#pragma mark - 推送extension
+
+- (HYXPushNoticeSoundType)soundType;
+
+- (HYXPushNoticeSoundType)testSoundType;
+
+- (BOOL)_needBaiduSound;
+
+- (BOOL)_needNormalSound;
+
+- (void)setSoundType:(HYXPushNoticeSoundType)soundType;
+
+- (void)setTestSoundType:(HYXPushNoticeSoundType)testSoundType;
+
+- (HYXPushSoundDownStatus)downStatus;
+
+- (void)badgePlusOne;
+    
+- (NSNumber * _Nullable)currentBadge;
+
+- (UNNotificationSound *_Nullable)_normalSound:(UNMutableNotificationContent * _Nullable)bestAttemptContent  API_AVAILABLE(ios(10.0));
+
+- (BOOL)voiceSwitchOpen;
+
+- (HYXPushType)pushType:(NSString * _Nullable)msgType;
+
+- (void)startPlayContentVoice:(NSString * _Nonnull)willReadContent
+           bestAttemptContent:(UNMutableNotificationContent * _Nonnull)bestAttemptContent
+               contentHandler:(void (^_Nullable)(UNNotificationContent * _Nonnull))contentHandler API_AVAILABLE(ios(10.0));
+
+- (void)setApnsSound:(UNMutableNotificationContent * _Nonnull)bestAttemptContent
+      contentHandler:(void (^_Nonnull)(UNNotificationContent * _Nonnull))contentHandler API_AVAILABLE(ios(10.0));
+
+- (void)_readByBaiduWith:(NSString * _Nonnull)str;
+
+- (void)didEndExtention:(UNMutableNotificationContent * _Nonnull)bestAttemptContent
+         contentHandler:(void (^_Nonnull)(UNNotificationContent * _Nonnull))contentHandler  API_AVAILABLE(ios(10.0));
+
+#pragma mark - 工具类
+- (NSString * _Nullable)amountBySubtitle:(NSString * _Nullable)subtitle;
+
+- (NSString * _Nullable)staticOnePointStringBySubtitle:(NSString * _Nullable)subtitle;
+
+- (NSString * _Nullable)staticStringBySubtitle:(NSString * _Nullable)subtitle;
+
+// 保留一位小数
+- (NSString * _Nullable)onePointformatFloat:(NSString *_Nullable )amount;
+
+// 获取2个字符 之间的文字
+- (NSString * _Nullable)subString:(NSString * _Nullable)string from:(NSString * _Nullable)startString to:(NSString * _Nullable)endString;
+
+- (BOOL)needVoiceAlert:(NSString * _Nullable)sjlx isLogin:(NSString *_Nullable)isLogin;
+
+/// 开始下载tts文件
+/// @param text 要播报的文字
+- (void)downloadMp3ThenRead:(NSString * _Nullable)text;
+
+/// 超过5min的消息不播报
+/// @param sendTime sendTime
+- (BOOL)ingoreForOldMsg:(NSString * _Nullable)sendTime;
+
+/// 上传推送信息
+/// @param apns apns
+- (void)uploadApnsMsg:(NSDictionary * _Nullable)apns;
+
+#pragma mark - 后台保活
+
+/// app是否处于活跃中
+/// @param active active
+- (void)setAppState:(BOOL)active;
+
+/// 当前app是否处于活跃中
+- (BOOL)appState;
+@end
 ```
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(jumpLogin) name:@"logOut" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(jumpRoot) name:@"JumpRoot" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(addTags:) name:@"AddTags" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(exchangeStore:) name:@"ExchangeStore" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(launchResource) name:@"HYXLaunchResourceDidChangeNotification" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveLoginUserInfo:) name:@"saveLoginUserInfo" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveBaseSync:) name:@"saveBaseSync" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveSignBaseSync:) name:@"saveSignBaseSync" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(savePhoneSync:) name:@"savePhoneSync" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveDpInfo:) name:@"SaveDpInfo" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveIMessage:) name:@"HYXZDHMessageRedPointNotification" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(postRequest) name:HTTPPOSTRequestNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onUploadAppEnter) name:kHYXAppEnterBackgroundNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(collectionOCRLog:) name:@"collectionOCRLog" object:nil];
-    [self appLunchHandleCollectionLocalLog:launchOptions];
-    return YES ;
-}
-```
+
 
 2.修改后
 
-```
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    [self.appNotisManager addObserver];
-    [launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey]];
-    return YES ;
-}
+![优化后](./shot1.png)
 
-```
-
-```
-- (void)addObserver {
-    [self.loginNotisProxy registObserver];
-    [self.launchNotisProxy registObserver];
-    [self.syncNotisProxy registObserver];
-    [self.zdhNotisProxy registObserver];
-    [self.httpNotisProxy registObserver];
-    [self.customLogNotisProxy registObserver];
-    [self.thirdSDKNotisProxy registObserver];
-}
-```
 
 ### **优点**
 
-1.降低类的复杂度，一个类只负责一个职责。这样写出来的代码逻辑肯定要比负责多项职责简单得多。
+1.接口服务隔离。
 
-2.提高类的可读性，提高系统的可维护性。
+2.调用者可按需使用。
 
-3.降低变更引起的风险。变更是必然的，如果单一职责原则遵守得好，当修改一个功能的时候可以显著降低对其他功能的影响。
-
->需要说明的一点是，单一职责原则不只是面向对象编程思想所特有的，只要是模块化的程序设计，都适用单一职责原则。比如说单一职责原则不仅仅适用于类，还适用于方法。
+>需要说明的一点是，接口划分也不能过细，导致依赖过多，走向另一个极端。
 
 ### **参与贡献**
 
