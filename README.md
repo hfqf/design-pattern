@@ -1,33 +1,39 @@
-# design-pattern
+<!--
+ * @Author: user.email
+ * @Date: 2023-01-30 19:50:25
+ * @LastEditors: user.email
+ * @LastEditTime: 2023-01-31 19:27:44
+ * @FilePath: /design-pattern/README.md
+ * @Description: 
+ * 
+ * Copyright (c) 2023 by hfqf123@126.com, All Rights Reserved. 
+-->
+# 软件设计原则+设计模式讲解
 
-#### 介绍
+### **软件设计原则**
+
+讲解关于软件开发中的通用设计原则
+
+1. 单一职责原则 &nbsp;&nbsp;&nbsp;  $\color{green}{✔}$
+ 
+2. 接口隔离原则 &nbsp;&nbsp;&nbsp; $\color{green}{✔}$
+
+3. 开放封闭原则 &nbsp;&nbsp;&nbsp;&nbsp;$\color{green}{✔}$
+
+4. 里氏代替原则 &nbsp;&nbsp;&nbsp;&nbsp;$\color{green}{✔}$
+
+5. 依赖倒置原则 &nbsp;&nbsp;&nbsp;&nbsp;$\color{green}{✔}$
+### **设计模式**
+
 关于设计模式的个人理解和使用经验分享。
-1.单例 待完成
-2.工厂+抽象工厂 待完成
-...
 
-#### 软件架构
-软件架构说明
+1. 单例 待完成
+
+2. 工厂+抽象工厂 待完成
+
+3. ...
 
 
-#### 安装教程
-
-1.  xxxx
-2.  xxxx
-3.  xxxx
-
-#### 使用说明
-
-1.  xxxx
-2.  xxxx
-3.  xxxx
-
-#### 参与贡献
-
-1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
-3.  提交代码
-4.  新建 Pull Request
 
 
 #### 特技
