@@ -2,79 +2,42 @@
  * @Author: hfqf123@126.com
  * @Date: 2023-01-09 08:38:46
  * @LastEditors: user.email
- * @LastEditTime: 2023-01-30 19:38:45
- * @FilePath: /软设流程图/app设计规范/软件设计原则(SOLID)/接口隔离原则(ISP)/README.md
+ * @LastEditTime: 2023-01-31 19:15:15
+ * @FilePath: /design-pattern/app设计规范/软件设计原则(SOLID)/里氏代替原则(LSP)/README.md
  * @Description: 
  * 
  * Copyright (c) 2023 by hfqf123@126.com, All Rights Reserved. 
 -->
-# 接口隔离原则
+# 里氏代替原则
 
 ### **介绍**
-依赖倒置原则（Dependence Inversion Principle，DIP）是指设计代码结构时，高层模块不应该依赖低层模块，二者都应该依赖其抽象。
+里氏替换原则（Liskov Substitution Principle,LSP）: 任何基类可以出现的地方，子类一定可以出现。
 
-抽象不应该依赖细节，细节应该依赖抽象。通过依赖倒置，可以减少类与类之间的耦合性，提高系统的稳定性，提高代码的可读性和可维护性，并且能够降低修改程序所造成的风险。
+通俗理解：子类可以扩展父类的功能，但不能改变父类原有的功能。换句话说，子类继承父类时，除添加新的方法完成新增功能外，尽量不要重写父类的方法。
 
 ### **问题来源**
-说到单一职责原则，很多人都会不屑一顾，因为它太简单了。稍有经验的程序员即使从来没有读过设计模式，从来没有听说过单一职责原则，在设计软件的时候也会自觉遵守这个重要原则，因为这是一个常识。在软件编程中，谁也不希望因为修改了一个功能导致其他的功能发生故障。而避免出现这一问题的方法便是遵循单一职责原则。虽然单一职责原则如此简单，并且被认为是常识，但是即使是经验丰富的程序员写出的程序也会有违背这一设计原则的代码存在。这是职责扩散导致的。
+如果通过重写父类的方法来完成新的功能，这样写起来虽然简单，但是整个继承体系的可复用性会比较差，特别是运用多态比较频繁时，程序运行出错的概率会非常大。
 
-### **优化示例**
+### **关键点**
 
-1.修改前
+1、子类可以实现父类的抽象方法，但是不能覆盖父类的非抽象方法
 
-```
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(jumpLogin) name:@"logOut" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(jumpRoot) name:@"JumpRoot" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(addTags:) name:@"AddTags" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(exchangeStore:) name:@"ExchangeStore" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(launchResource) name:@"HYXLaunchResourceDidChangeNotification" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveLoginUserInfo:) name:@"saveLoginUserInfo" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveBaseSync:) name:@"saveBaseSync" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveSignBaseSync:) name:@"saveSignBaseSync" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(savePhoneSync:) name:@"savePhoneSync" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveDpInfo:) name:@"SaveDpInfo" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveIMessage:) name:@"HYXZDHMessageRedPointNotification" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(postRequest) name:HTTPPOSTRequestNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onUploadAppEnter) name:kHYXAppEnterBackgroundNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(collectionOCRLog:) name:@"collectionOCRLog" object:nil];
-    [self appLunchHandleCollectionLocalLog:launchOptions];
-    return YES ;
-}
-```
+里氏替换原则的关键点在于不能覆盖父类的非抽象方法。父类中凡是已经实现好的方法，实际上是在设定一系列的规范和契约，虽然它不强制要求所有的子类必须遵从这些规范，但是如果子类对这些非抽象方法任意修改，就会对整个继承体系造成破坏。而里氏替换原则就是表达了这一层含义。
 
-2.修改后
+2、子类中可以增加自己特有的方法
 
-```
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    [self.appNotisManager addObserver];
-    [launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey]];
-    return YES ;
-}
+在继承父类属性和方法的同时，每个子类也都可以有自己的个性，在父类的基础上扩展自己的功能。前面其实已经提到，当功能扩展时，子类尽量不要重写父类的方法，而是另写一个方法
 
-```
+### **实施例子**
 
-```
-- (void)addObserver {
-    [self.loginNotisProxy registObserver];
-    [self.launchNotisProxy registObserver];
-    [self.syncNotisProxy registObserver];
-    [self.zdhNotisProxy registObserver];
-    [self.httpNotisProxy registObserver];
-    [self.customLogNotisProxy registObserver];
-    [self.thirdSDKNotisProxy registObserver];
-}
-```
+![优化前](./shot1.png)
 
+该例子中由于存在多种请求方案:表单方式不同、post内容不同、请求头不同等个性化需求，但具体调用方式需要统一风格，采取抽象工厂模式+建造者模式+模版模式，通过子类重写post等方法的方式完成了里氏替换原则的体现。
 ### **优点**
 
-1.降低类的复杂度，一个类只负责一个职责。这样写出来的代码逻辑肯定要比负责多项职责简单得多。
+1.系统稳定，可以保证基础类不被修改。
 
-2.提高类的可读性，提高系统的可维护性。
-
-3.降低变更引起的风险。变更是必然的，如果单一职责原则遵守得好，当修改一个功能的时候可以显著降低对其他功能的影响。
-
->需要说明的一点是，单一职责原则不只是面向对象编程思想所特有的，只要是模块化的程序设计，都适用单一职责原则。比如说单一职责原则不仅仅适用于类，还适用于方法。
+2.提高代码可扩展性。
 
 ### **参与贡献**
 
