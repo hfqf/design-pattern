@@ -2,7 +2,7 @@
  * @Author: user.email
  * @Date: 2023-01-30 19:50:25
  * @LastEditors: user.email
- * @LastEditTime: 2023-01-31 19:33:44
+ * @LastEditTime: 2023-01-31 20:08:58
  * @FilePath: /design-pattern/README.md
  * @Description: 
  * 
@@ -36,6 +36,16 @@
 ### **目录浏览**
 
 ![目录](./shot1.png)
+
+### **内容浏览**
+
+![spr](./spr.jpeg)
+![isp](./isp.jpeg)
+![ocp](./ocp.jpeg)
+![lsp](./lsp.jpeg)
+![dip](./dip.jpeg)
+
+
 
 #### 特技
 
